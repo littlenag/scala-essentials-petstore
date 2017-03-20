@@ -1,0 +1,22 @@
+<configuration>
+    <!-- a reasonable set of startup logging options -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%date %highlight(%-5level) %cyan(%-40.40(%logger{40})) - %m%n%rootException</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="akka" level="INFO"/>
+
+    <logger name="essentials" level="DEBUG"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

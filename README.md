@@ -1,2 +1,2 @@
-# scala-essentials-petstore
-Pet store demo app
+# scala-essentials-simple-app
+Simple Scala Application
