@@ -17,10 +17,10 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * The server lets clients save and view persons.
   */
-object AppServer extends HttpApp with RestUtils with PlayJsonSupport with LazyLogging {
+object AppServer extends HttpApp with ModelFormatters with LazyLogging {
 
   /** Defines the HTTP requests our server accepts and how it responds. */
-  override protected def route: Route =
+  override def route: Route =
     handleExceptions(exceptionHandler) {
       handleRejections(rejectionHandler) {
         path("pets") {
@@ -56,7 +56,7 @@ object AppServer extends HttpApp with RestUtils with PlayJsonSupport with LazyLo
 
 }
 
-trait RestUtils {
+trait ModelFormatters extends PlayJsonSupport {
   import play.api.libs.json.Json
 
   // JSON formatters (i.e. convert object to/from JSON) that we can use
@@ -64,3 +64,4 @@ trait RestUtils {
   implicit val ownerFormat: OFormat[Owner] = Json.format[Owner]
 }
 
+object ModelFormatters extends ModelFormatters

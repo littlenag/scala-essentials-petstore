@@ -1,9 +1,7 @@
 package essentials.petstore.database
 
-import java.util.UUID
-
 import essentials.petstore.domain.Models._
-import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.H2Profile.api._
 import slick.jdbc.meta.MTable
 import com.typesafe.scalalogging.LazyLogging
 
@@ -41,7 +39,7 @@ object AppDb extends LazyLogging {
   setUpDb()
 
   class PetsTable(tag: Tag) extends Table[Pet](tag, "pets") {
-    def id = column[UUID]("id", O.PrimaryKey)
+    def id = column[Long]("id", O.PrimaryKey)
 
     def name = column[String]("name")
 

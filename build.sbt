@@ -10,6 +10,7 @@ scalacOptions ++= Seq(
   "-feature",                      // Emit warning and location for usages of features that should be imported explicitly.
   "-explaintypes",                 // Explain type errors in more detail.
   "-language:higherKinds",         // enable higher-kinded types
+  "-language:postfixOps",          // enable post-fix operations
   "-Xfuture",                      // hide procedure syntax
   "-Xlint:missing-interpolator",
   "-Yno-adapted-args",             // Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver.
@@ -41,6 +42,8 @@ libraryDependencies ++= Seq(
   "com.mattbertolini" % "liquibase-slf4j" % "2.0.0" % "runtime",
 
   "com.h2database" % "h2" % "1.4.194",
+
+  "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
 
   "ch.qos.logback" % "logback-classic" % "1.2.2",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",

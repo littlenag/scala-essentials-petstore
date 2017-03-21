@@ -1,4 +1,4 @@
-package essentials
+package essentials.petstore
 
 import org.scalatest._
 
