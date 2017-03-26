@@ -20,8 +20,8 @@ scalacOptions ++= Seq(
   "-Ywarn-unused-import",
   "-Ywarn-unused",
   "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen"
-  //"-Xfatal-warnings"               // All warnings become errors and stop compilation
+  "-Ywarn-numeric-widen",
+  "-Xfatal-warnings"               // All warnings become errors and stop compilation
 )
 
 // Specifiy these once so our dependencies don't get out of sync
@@ -37,6 +37,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
 
+  // https://www.playframework.com/documentation/2.5.x/ScalaJson
   "com.typesafe.play" %% "play-json" % "2.6.0-M5",
   "de.heikoseeberger" %% "akka-http-play-json" % "1.14.0",
 
@@ -44,14 +45,10 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % slickVersion,
   "com.typesafe.slick" %% "slick-hikaricp" % slickVersion,
 
-//  "org.liquibase" % "liquibase-core" % "3.5.3",
-//  "com.mattbertolini" % "liquibase-slf4j" % "2.0.0" % "runtime",
-
   "com.h2database" % "h2" % "1.4.194",
 
+  // https://github.com/adamw/macwire
   "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided",
-
-//  "joda-time" % "joda-time" % "2.9.7",
 
   "ch.qos.logback" % "logback-classic" % "1.2.2",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
