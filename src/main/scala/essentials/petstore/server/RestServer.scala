@@ -6,18 +6,19 @@ import akka.http.scaladsl.model.{StatusCodes, _}
 import akka.http.scaladsl.server.{ExceptionHandler, HttpApp, RejectionHandler, Route}
 import akka.http.scaladsl.model.HttpResponse
 import com.typesafe.scalalogging.LazyLogging
-import essentials.petstore.database.AppDb
-import essentials.petstore.domain.Models._
+import essentials.petstore.domain._
 import play.api.libs.json.OFormat
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import essentials.petstore.database.PetsRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * The server lets clients save and view persons.
   */
-object AppServer extends HttpApp with ModelFormatters with LazyLogging {
+class RestServer(petsRepo: PetsRepository) extends HttpApp with ModelFormatters with LazyLogging {
+
+  case class ValidationException(message:String) extends Exception(message)
 
   /** Defines the HTTP requests our server accepts and how it responds. */
   override def route: Route =
@@ -25,11 +26,14 @@ object AppServer extends HttpApp with ModelFormatters with LazyLogging {
       handleRejections(rejectionHandler) {
         path("pets") {
           get {
-            complete(AppDb.getAllPets)
+            complete(petsRepo.getAllPets)
           } ~
           post {
             entity(as[Pet]) { pet =>
-              complete(AppDb.save(Seq(pet)))
+              pet.species match {
+                case "cat" | "dog" => complete(petsRepo.saveOne(pet))
+                case other => failWith(ValidationException(s"Unrecognized species: $other"))
+              }
             }
           }
         }
@@ -37,6 +41,8 @@ object AppServer extends HttpApp with ModelFormatters with LazyLogging {
     }
 
   private lazy val exceptionHandler = ExceptionHandler {
+    case ValidationException(msg) =>
+      complete(HttpResponse(StatusCodes.UnprocessableEntity, entity = msg))
     case ex : Exception =>
       complete(HttpResponse(StatusCodes.InternalServerError, entity = s"Bad result: ${ex.getMessage}"))
   }
