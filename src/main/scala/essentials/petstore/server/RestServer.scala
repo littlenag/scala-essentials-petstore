@@ -6,9 +6,9 @@ import akka.http.scaladsl.model.{StatusCodes, _}
 import akka.http.scaladsl.server.{ExceptionHandler, HttpApp, RejectionHandler, Route}
 import akka.http.scaladsl.model.HttpResponse
 import com.typesafe.scalalogging.LazyLogging
-import essentials.petstore.domain._
 import play.api.libs.json.OFormat
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import essentials.petstore.domain._
 import essentials.petstore.database.PetsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,24 +18,30 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class RestServer(petsRepo: PetsRepository) extends HttpApp with ModelFormatters with LazyLogging {
 
+  import petsRepo.dbConfig.profile.api._
+
   case class ValidationException(message:String) extends Exception(message)
 
   /** Defines the HTTP requests our server accepts and how it responds. */
   override def route: Route =
     handleExceptions(exceptionHandler) {
       handleRejections(rejectionHandler) {
-        path("pets") {
+        (path("pets") & parameter('intact.as[Boolean] ? false)) { wantIntact =>
+          // TODO add query parameters so that we can filter on age and species
           get {
-            complete(petsRepo.getAllPets)
+            complete(petsRepo.getPets(wantIntact))
           } ~
           post {
             entity(as[Pet]) { pet =>
+              // TODO this isn't a very type-safe way to validate
               pet.species match {
                 case "cat" | "dog" => complete(petsRepo.saveOne(pet))
                 case other => failWith(ValidationException(s"Unrecognized species: $other"))
               }
             }
           }
+          // TODO Seem to be missing Update and Delete routes for Pets
+          // TODO Add routes+logic to handle Pet Owners as well
         }
       }
     }
@@ -65,9 +71,10 @@ class RestServer(petsRepo: PetsRepository) extends HttpApp with ModelFormatters 
 trait ModelFormatters extends PlayJsonSupport {
   import play.api.libs.json.Json
 
+  // TODO add validation to petFormat, for example age < 0 shouldn't be valid
+
   // JSON formatters (i.e. convert object to/from JSON) that we can use
   implicit val petFormat: OFormat[Pet] = Json.format[Pet]
-  implicit val ownerFormat: OFormat[Owner] = Json.format[Owner]
 }
 
 object ModelFormatters extends ModelFormatters

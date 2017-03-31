@@ -29,11 +29,9 @@ trait PetsTable { this: Db =>
 
     def age = column[Int]("age")
 
-    def sex = column[String]("sex")
-
     def fixed = column[Boolean]("fixed")
 
-    def * = (name, species, age, sex, fixed, id) <> (Pet.tupled, Pet.unapply)
+    def * = (name, species, age, fixed, id) <> (Pet.tupled, Pet.unapply)
   }
 
   val pets = TableQuery[Pets]
@@ -43,6 +41,11 @@ class PetsRepository(val dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: Exe
   import dbConfig.profile.api._
 
   def getAllPets: Future[Try[Seq[Pet]]] = db.run(pets.result.asTry)
+
+  def getPets(includeIntact:Rep[Boolean]): Future[Try[Seq[Pet]]] = {
+    val petsQuery = pets.filter(row => includeIntact || row.fixed)
+    db.run(petsQuery.result.asTry)
+  }
 
   def saveOne(petToAdd: Pet): Future[Pet] = {
     db.run(pets returning pets.map(_.id) += petToAdd).map(id => petToAdd.copy(id = id))

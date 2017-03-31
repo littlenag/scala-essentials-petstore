@@ -27,14 +27,14 @@ class PetstoreSpec extends UnitSpec with ModelFormatters with ScalatestRouteTest
     }
 
     "save listing of a pet cat" in {
-      val pet = Pet("snuggles", "cat", 12, "male", fixed = true)
+      val pet = Pet("snuggles", "cat", 12, fixed = true)
       Post("/pets", pet) ~> restServer.route ~> check {
         status should be(OK)
       }
     }
 
     "not save listing of a pet alligator" in {
-      val pet = Pet("bitey", "alligator", 3, "female", fixed = false)
+      val pet = Pet("bitey", "alligator", 3, fixed = false)
       Post("/pets", pet) ~> restServer.route ~> check {
         status should be(UnprocessableEntity)
       }
@@ -45,5 +45,7 @@ class PetstoreSpec extends UnitSpec with ModelFormatters with ScalatestRouteTest
         responseAs[Seq[Pet]] should have size 1
       }
     }
+
+    // TODO test our /pets GET route to ensure the intact param works as intended
   }
 }
