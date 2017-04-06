@@ -9,14 +9,14 @@ import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.OFormat
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import essentials.petstore.domain._
-import essentials.petstore.database.PetsRepository
+import essentials.petstore.database.{PetRecordsRepository, PetsRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * The server lets clients save and view persons.
   */
-class RestServer(petsRepo: PetsRepository) extends HttpApp with ModelFormatters with LazyLogging {
+class RestServer(petsRepo: PetsRepository, petRecordsRepo:PetRecordsRepository) extends HttpApp with ModelFormatters with LazyLogging {
 
   import petsRepo.dbConfig.profile.api._
 
@@ -41,8 +41,18 @@ class RestServer(petsRepo: PetsRepository) extends HttpApp with ModelFormatters 
             }
           }
           // TODO Seem to be missing Update and Delete routes for Pets
-          // TODO Add routes+logic to handle Pet Owners as well
+        } ~
+        path("records") {
+          get {
+            complete(petRecordsRepo.getAll)
+          } ~
+          post {
+            entity(as[PetRecord]) { record =>
+              complete(petRecordsRepo.saveOne(record))
+            }
+          }
         }
+        // TODO Add routes+logic to handle Pet Owners as well
       }
     }
 
@@ -75,6 +85,7 @@ trait ModelFormatters extends PlayJsonSupport {
 
   // JSON formatters (i.e. convert object to/from JSON) that we can use
   implicit val petFormat: OFormat[Pet] = Json.format[Pet]
+  implicit val petRecordsFormat: OFormat[PetRecord] = Json.format[PetRecord]
 }
 
 object ModelFormatters extends ModelFormatters

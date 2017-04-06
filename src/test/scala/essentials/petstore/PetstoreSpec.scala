@@ -2,8 +2,9 @@ package essentials.petstore
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import essentials.petstore.domain.Pet
+import essentials.petstore.domain.{Pet, PetRecord}
 import essentials.petstore.server.ModelFormatters
+import org.joda.time.DateTime
 
 class PetstoreSpec extends UnitSpec with ModelFormatters with ScalatestRouteTest {
 
@@ -43,6 +44,19 @@ class PetstoreSpec extends UnitSpec with ModelFormatters with ScalatestRouteTest
     "only see 1 pet listing" in {
       Get("/pets") ~> restServer.route ~> check {
         responseAs[Seq[Pet]] should have size 1
+      }
+    }
+
+    "attach record to pet" in {
+      val pet = Get("/pets") ~> restServer.route ~> check {
+        val response = responseAs[Seq[Pet]]
+        response should have size 1
+        response.head
+      }
+
+      val petRecord = PetRecord(Some("Going to a loving home."), Some(new DateTime()), pet.id.getOrElse(throw new IllegalArgumentException))
+      Post("/records", petRecord) ~> restServer.route ~> check {
+        status should be(OK)
       }
     }
 

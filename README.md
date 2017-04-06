@@ -4,8 +4,7 @@ Welcome to the workshop Petstore where at the end of the day you'll be able to t
 
 Unfortunately, the Petstore needs a bit of work before it will be fully operational. The core logic is here, the project builds, and the test pass but all the real work is yet to be done. Are you up to the challenge?
 
-Things you might like to try!
- 
+Things you might like to try:
 * Add/modify field of some JSON project case class
 * Add validation to JSON marshaller
 * Extend app domain, add routes classes, etc
@@ -15,3 +14,6 @@ Things you might like to try!
 * Add columns to table
 * Add table to db
 * Akka actors or streams
+
+For the complete list of exercises see
+https://www.scala-enthusiasts.com/scala-essentials-workshop-exercises/
